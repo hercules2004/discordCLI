@@ -50,7 +50,6 @@ Future<void> createServer(User curruser) async {
         where.eq('name', this.name),
         modify.set('users', updatedUsers),
       );
-      print('Server document updated successfully!');
     } else {
       print('Server document not found.');
     }
@@ -83,7 +82,6 @@ Future<bool> joinServer(User curruser) async{
                    where.eq('name', this.name),
                    modify.set('users', updatedUsers),
               );
-              print('Server document updated successfully!');
             } else {
               print('Server document not found.');
             }
@@ -125,7 +123,6 @@ Future<void> createChannel(var channelName, var userName) async {
         where.eq('name', this.name),
         modify.set('channels', updatedChannels),
       );
-      print('Server document updated successfully!');
     }
     } else {
       print('Server document not found.');
@@ -176,6 +173,24 @@ Future<void> viewUsers() async{
   }
 }
 
+Future<void> viewChannels() async{
+   try {
+    var server1 = await server.findOne(where.eq('name', this.name));
+    if (server1 != null) {
+      var updatedChannels = List<Map<String, dynamic>>.from(server1['channels'] ?? []);
+      for(var channel in updatedChannels){
+        print(channel['name']);
+      }
+      
+      
+    } else {
+      print('Server document not found.');
+    }
+  } catch (e) {
+    print('Error joining the channel: $e');
+  }
+}
+
  
 Future<void> sendMessage(var msg, User user, var channelName) async {
   
@@ -191,10 +206,7 @@ Future<void> sendMessage(var msg, User user, var channelName) async {
       );
       
       if (channelMap != null) {
-        print('a');
-        //var updatedChannels = (server1['channels'] as List?)?.cast<Map<String, dynamic>>() ?? [];
         var messagesList=(channelMap['messages'] as List?)?.cast<Map<String,dynamic>>() ?? [];
-        //var messagesList = channelMap['messages'] as List<Map<String, dynamic>>? ?? [];
         messagesList.add({
           'message': msg,
           'user': {
@@ -208,7 +220,6 @@ Future<void> sendMessage(var msg, User user, var channelName) async {
           modify.set('channels', updatedChannels),
         );
         
-        print('Message added successfully to the channel!');
       } else {
         print('Channel not found in the server.');
       }

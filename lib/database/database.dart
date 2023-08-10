@@ -2,6 +2,7 @@ import 'package:dart_discord/dart_discord.dart' as dart_discord;
 import 'dart:io';
 import 'package:mongo_dart/mongo_dart.dart';
 
+
  late Db? db; 
 late DbCollection collection; 
   late DbCollection server;
@@ -42,9 +43,10 @@ Future<void> addUser(var name, var password) async {
     }
           var obj1=await collection.findOne({"name" : name});
           if(obj1==null){
+            
       var document = {'name': name, 'password': password};
       await collection.insert(document);
-      print('Document inserted successfully!');
+      print('User registered.');
     }else print('User already registered');
     } catch (e) {
       print('Error: $e');
@@ -63,6 +65,7 @@ Future<bool> login(String? name, String? password) async {
         print('The User is not registered yet');
         return false;
       }else{
+        
         if(obj1['password']==password){
             print('Login Successfull');
             return true;

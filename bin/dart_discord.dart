@@ -1,9 +1,15 @@
 import 'package:dart_discord/dart_discord.dart' as dart_discord;
 import 'dart:io';
 import 'package:dart_discord/models/users.dart';
+import 'dart:convert';
 import 'package:dart_discord/models/servers.dart';
+import 'package:crypto/crypto.dart'; 
 
-
+String hashPassword(String password) {
+  final bytes = utf8.encode(password);
+  final hash = sha256.convert(bytes);
+  return hash.toString();
+}
 
 void main(List<String> arguments) async {
   bool running = true;
@@ -14,18 +20,23 @@ void main(List<String> arguments) async {
   bool messageSend=false;
 
   while (running) {
-    print("Hello");
 
     if (!loggedIn) {
       var input = stdin.readLineSync();
-      if (input == "register") {
+      if(input=="exit"){
+        print("Do you want to exit? Enter 'Y' or 'N'.");
+        var input2=stdin.readLineSync();
+        if(input2=="Y") break;
+      }
+      else if (input == "register") {
         print("Enter your name");
         var name = stdin.readLineSync();
         print("Enter password");
         var password = stdin.readLineSync();
         print("Confirm Your Password");
         var cpassword = stdin.readLineSync();
-        var user1 = User(name, password);
+        String password1=hashPassword(password!);
+        var user1 = User(name, password1);
         if (password == cpassword) {
           await user1.register();
         } else {
@@ -36,11 +47,13 @@ void main(List<String> arguments) async {
         var name = stdin.readLineSync();
         print("Enter password");
         var password = stdin.readLineSync();
-        curruser = User(name, password);
+        String password1=hashPassword(password!);
+        curruser = User(name, password1);
         loggedIn = await curruser.login();
       }
     } else {
       print("Do you want to create a server or join a server?");
+      print('Enter "logout" to log out from your account. Enter "user" to check who is logged in at the moment.');
       var input2 = stdin.readLineSync();
       bool serverLogin=false;
       if (input2 == "create") {
@@ -72,10 +85,13 @@ void main(List<String> arguments) async {
       while(serverLogin){
         bool channelLogin=false;
         print('Do you want to create a channel or join a channel. Enter "exit" for exiting the current server.');
-        print('The command "view users" would enable you to check all tghe users joined in the server');
+        print('The command "view users" would enable you to check all the users joined in the server');
+        print('The command "view channels" would enable you to check all the current channels in the ');
         var input2=stdin.readLineSync();
         if(input2=="view users"){
           await currserver.viewUsers();
+        }else if(input2=="view channels"){
+          await currserver.viewChannels();
         }
         else if(input2=="exit") serverLogin=false;
         else if(input2=="create"){
